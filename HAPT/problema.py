@@ -17,6 +17,8 @@ class Solucao(object):
         
         self.alocacoes = {}
         
+        self.valorBeneficio = None
+        
         for turma in instancia.turmas:
             alocacao = []
             for i in range(0,2):
@@ -73,10 +75,10 @@ class Solucao(object):
         return self.alocacoes[tuplaTurmaTempoDia[0]][tuplaTurmaTempoDia[1]][tuplaTurmaTempoDia[2]]
     
     def setSlot(self,turma,tempo,dia,alocacaoSlot):
+        self.valorBeneficio = None
         self.alocacoes[turma][tempo][dia] = alocacaoSlot
     
-    def valida(self):
-        
+    def valida(self):    
         restricoesDeInstancia = self.restricoesDeInstancia()
         restricaoA = self.restricaoA()  
         restricaoB = self.restricaoB()
@@ -212,19 +214,101 @@ class Solucao(object):
         
         return True
     
-    def beneficio(self):
-        return beneficio(self)
+    # Metodos de troca
+    def trocaSlot(self,slot1,slot2):
+        solucao = copy.deepcopy(self)
+        
+        novoSlot1 = copy.deepcopy(solucao.getSlot(slot1))
+        novoSlot2 = copy.deepcopy(solucao.getSlot(slot2))
+        
+        solucao.setSlot(slot2[0],slot2[1],slot2[2],novoSlot1)
+        
+        solucao.setSlot(slot1[0],slot1[1],slot1[2],novoSlot2)  
+        
+        return solucao
+    
+    def trocaTurma(self,slot1,slot2):
+        solucao = copy.deepcopy(self)
+        
+        alocacao1 = copy.deepcopy(solucao.getSlot(slot1))
+        alocacao2 = copy.deepcopy(solucao.getSlot(slot2))
+        
+        novaAlocacao = (alocacao2[0],alocacao1[1])
+        solucao.setSlot(slot1[0],slot1[1],slot1[2],novaAlocacao)
+        
+        novaAlocacao = (alocacao1[0],alocacao2[1])
+        solucao.setSlot(slot2[0],slot2[1],slot2[2],novaAlocacao)
+        
+        return solucao
+    
+    def trocaProfessor(self,slot1,slot2):
+        solucao = copy.deepcopy(self)
+        
+        alocacao1 = solucao.getSlot(slot1)
+        alocacao2 = solucao.getSlot(slot2)
+        
+        novaAlocacao = (alocacao1[0],alocacao2[1])
+        solucao.setSlot(slot1[0],slot1[1],slot1[2],novaAlocacao)
+        
+        novaAlocacao = (alocacao2[0],alocacao1[1])
+        solucao.setSlot(slot2[0],slot2[1],slot2[2],novaAlocacao)
+        
+        return solucao
+    
+    def trocaProfessorEntreTurmas(self,turma1,turma2,disciplina1,disciplina2):
+        solucao = copy.deepcopy(self)
+        
+        professor1 = professor2 = None
+        
+        for j1 in range(0,5):
+            for i1 in range(0,2):
+                slot1 = solucao.getSlot((turma1,i1,j1))
+                if slot1 is not None:
+                    if slot1[0] == disciplina1:
+                        
+                        if professor1 is None: professor1 = slot1[1]
+                        
+                        for j2 in range(0,5):
+                            for i2 in range(0,2):
+                                slot2 = solucao.getSlot((turma2,i2,j2))
+                                if slot2 is not None:
+                                    if slot2[0] == disciplina2:
+                                        
+                                        if professor2 is None: professor2 = slot2[1]
+                                        
+                                        novoSlot = (slot1[0],professor2)
+                                        solucao.setSlot(turma1,i1,j1,novoSlot)
+                                        
+                                        novoSlot = (slot2[0],professor1)
+                                        solucao.setSlot(turma2,i2,j2,novoSlot)
+        
+        return solucao
+    
+    def trocaProfessorDaDisciplinaNaTurma(self,turmaNome,disciplina,professor):
+        solucao = copy.deepcopy(self)          
+        for j in range(0,5):
+            for i in range(0,2):
+                slot = solucao.getSlot((turmaNome,i,j))       
+                if slot is not None:   
+                    if slot[0] == disciplina:
+                        slot = (slot[0],professor)
+                        solucao.setSlot(turmaNome,i,j,slot)
+    
+        return solucao
+    
+    def beneficio(self):   
+        if self.valorBeneficio is None:
+            self.valorBeneficio = beneficio(self)
+        return self.valorBeneficio
     
     def custoIncremental(self,slot):
-        solucaoIncrementada = copy.deepcopy(self)
-        
+        solucaoIncrementada = copy.deepcopy(self) 
         solucaoIncrementada.adicionar(slot)
         
         return solucaoIncrementada,beneficio(solucaoIncrementada)
         
 def beneficio(solucao):
     beneficio = 0
-#     z = 0
     for turmaNome in solucao.alocacoes.keys():
         matrizAlocacoesTurma = solucao.alocacoes[turmaNome]
         
@@ -236,26 +320,106 @@ def beneficio(solucao):
         for j in range(0,5):
             if matrizAlocacoesTurma[0][j] is not None and matrizAlocacoesTurma[1][j] is not None:
                 if matrizAlocacoesTurma[0][j][0] == matrizAlocacoesTurma[1][j][0]:
-#                     z+=1
-#                     print(z,'iguais')
                     beneficio+= 5
                 
     return beneficio
 
-
-def carregaTeste(solucao):
-    testePath = 'dataset/testeSolucao'
-    slotsMatrix = []
-    with open(testePath, encoding='utf-8', newline='\n') as testeSolucao:
-        for linha in testeSolucao:  
-            slots = linha.strip().split()
-            if len(slots) > 0:
-                slots = [('VAGA',None) if s.strip()=='VAGA' else (s.strip().split(',')[0],int(s.strip().split(',')[1])-1) for s in slots]
-                slotsMatrix.append(slots)              
-    for e,turmaNome in enumerate(sorted(solucao.instancia.turmas)): 
-        for i in range(0,2):               
-            for j in range(0,5):           
-                    index = (e+1)*2 - (1+i)     
-                    index = index - 1 if i == 0 else index + 1    
-                    solucao.setSlot(turmaNome, i, j, slotsMatrix[index][j])
+# Geradores de vizinhos para as 4 estruturas de vizinhancas
+def gerarVizinhoTHPMD(solucao):
+    slots = {}
+    
+    for j in range(0,5):
+        for turmaNome in solucao.instancia.turmas:
+            matrizAlocacoesTurma = solucao.alocacoes[turmaNome] 
+            
+            for i in range(0,2):
+                slots[(turmaNome,i,j)] = matrizAlocacoesTurma[i][j]
+    
+        chaves   = sorted(list(slots.keys()))
         
+        for i in range(0, len(list(slots.keys()))-1):
+            for j in range(i+1,len(list(slots.keys()))):              
+                
+                s = None      
+                   
+#             testando aqui a validade do movimento segundo as restricoes de instancia
+                if slots[chaves[i]] is not None and slots[chaves[j]] is not None:
+                    
+                    if slots[chaves[i]][1] != slots[chaves[j]][1]:
+                        if slots[chaves[i]][0] in solucao.instancia.nomesDisciplinasDaTurma(chaves[j][0])\
+                            and slots[chaves[j]][0] in solucao.instancia.nomesDisciplinasDaTurma(chaves[i][0]):
+                            
+                            s =  solucao.trocaSlot(chaves[i],chaves[j])
+                    
+                    elif not solucao.instancia.vaga(slots[chaves[i]]) and solucao.instancia.vaga(slots[chaves[j]]):
+                        if slots[chaves[i]][0] in solucao.instancia.nomesDisciplinasDaTurma(chaves[j][0]):
+                            
+                            s =  solucao.trocaSlot(chaves[i],chaves[j])
+                        
+                    elif solucao.instancia.vaga(slots[chaves[i]]) and not solucao.instancia.vaga(slots[chaves[j]]):
+                        if slots[chaves[j]][0] in solucao.instancia.nomesDisciplinasDaTurma(chaves[i][0]):
+                            
+                            s =  solucao.trocaSlot(chaves[i],chaves[j])
+                    
+                    if s is not None and s.valida():
+#                         print('1')
+                        yield s
+                        
+def gerarVizinhoTHPDD(solucao):
+    for j1 in range(0,4):
+        for turmaNome1 in solucao.instancia.turmas:
+            for i1 in range(0,2):
+                pivo1 = solucao.getSlot((turmaNome1,i1,j1))
+                
+                for j2 in range(j1+1,5):
+                    for turmaNome2 in solucao.instancia.turmas:
+                        for i2 in range(0,2):
+                            pivo2 = solucao.getSlot((turmaNome2,i2,j2))                      
+
+                            s = None        
+                            
+#                           Testando a validade do movimento segundo as restricoes de instancia
+                            if pivo1 is not None and pivo2 is not None:
+                                if pivo1[1] != pivo1[1]:
+                                    if pivo1[0] in solucao.instancia.nomesDisciplinasDaTurma(turmaNome2)\
+                                        and pivo2[0] in solucao.instancia.nomesDisciplinasDaTurma(turmaNome1):
+                                        
+                                        s =  solucao.trocaSlot((turmaNome1,i1,j1),(turmaNome2,i2,j2))
+                                
+                                elif not solucao.instancia.vaga(pivo1) and solucao.instancia.vaga(pivo2):
+                                    if pivo1[0] in solucao.instancia.nomesDisciplinasDaTurma(turmaNome2):
+                                        
+                                        s =  solucao.trocaSlot((turmaNome1,i1,j1),(turmaNome2,i2,j2))
+                                    
+                                elif solucao.instancia.vaga(pivo1) and not solucao.instancia.vaga(pivo2):
+                                    if pivo2[0] in solucao.instancia.nomesDisciplinasDaTurma(turmaNome1):
+                                        
+                                        s =  solucao.trocaSlot((turmaNome1,i1,j1),(turmaNome2,i2,j2))
+                                              
+                                if s is not None and s.valida():
+#                                     print('2')
+                                    yield s
+
+def gerarVizinhoTTEP(solucao):   
+    for i,turmaNome1 in enumerate(solucao.instancia.turmas[0:-1]):
+        for turmaNome2 in solucao.instancia.turmas[i+1:]:
+            
+            for i,disciplina1 in enumerate(solucao.instancia.disciplinasDaTurma(turmaNome1)[0:-1]):
+                for disciplina2 in solucao.instancia.disciplinasDaTurma(turmaNome2)[i+1:]:
+
+                    if not solucao.instancia.vaga(disciplina1) and not solucao.instancia.vaga(disciplina2):
+                        s = solucao.trocaProfessorEntreTurmas(turmaNome1,turmaNome2,disciplina1[0],disciplina2[0])                   
+                        if s is not None and s.valida():
+#                             print('3')
+                            yield s
+
+def gerarVizinhoTPD(solucao):
+    for turmaNome in solucao.instancia.turmas:
+        for disciplina in solucao.instancia.disciplinasDaTurma(turmaNome):    
+            if not solucao.instancia.vaga(disciplina): 
+                for professoresHabilitado in solucao.instancia.professoresHabilitados(disciplina):               
+                                   
+                    s =  solucao.trocaProfessorDaDisciplinaNaTurma(turmaNome, disciplina[0], professoresHabilitado)                 
+                    if s is not None and s.valida():
+#                         print('4')
+                        yield s        

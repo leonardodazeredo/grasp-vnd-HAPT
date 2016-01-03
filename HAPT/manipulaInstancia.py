@@ -5,9 +5,6 @@ matrizDePreferenciasPath = 'dataset/preferenciasProfessorHorario'
 disciplinasPorTurmasPath = 'dataset/disciplinasPorTurmas'
 disciplinasHabilitadasPath = 'dataset/disciplinasHabilitadas'
 
-from problema import *
-from metaheuristicas import GRASP_VND
-
 class Instancia(object):
     '''
     Representa os dados da instancia, os extraindo dos arquivos txt
@@ -92,7 +89,7 @@ class Instancia(object):
         with open(disciplinasHabilitadasPath, encoding='utf-8', newline='\n') as disciplinasHabilitadasPorProfessor:
             for disciplinasDoProfessori in disciplinasHabilitadasPorProfessor:    
                 disciplinasDoProfessori = disciplinasDoProfessori.split()
-#                 disciplinasDoProfessori.append('VAGA')
+
                 self.disciplinasDoProfessori.append(disciplinasDoProfessori)
                   
         with open(matrizDePreferenciasPath, encoding='utf-8', newline='\n') as preferenciasProfessorHorario:
@@ -109,67 +106,6 @@ class Instancia(object):
                             tupla = (tupla[0],p)
                             preferenciasDoProfessoriTuplas.append(tupla)
                     
-                    self.preferenciasDoProfessori.append(preferenciasDoProfessoriTuplas)            
-                       
-if __name__ == '__main__':
-    instancia = Instancia()
-    
-#     print(instancia.turmas,"\n")
-#     
-#     for d in instancia.disciplinas:
-#         print(d)   
-#     print("\n")
-#     
-#     for t in instancia.turmas:
-#         print(t,str(instancia.disciplinasDaTurma(t))) 
-#     print("\n")
-#     
-#     for i,t in enumerate(instancia.disciplinasDoProfessori):
-#         print(i,t)
-#     print("\n")
-#         
-#     for d in instancia.disciplinas:
-#         print(d,instancia.professoresHabilitados(d))
-#     print("\n")
-     
-#     solucao = Solucao(instancia) 
-#     carregaTeste(solucao)
-#     solucao.printSolucao()
-    
-#     solucao = GRASP_VND(5,instancia,0)     
-#     solucao.printSolucao()
-#
-#     solucao = GRASP_VND(50,instancia,0.25)     
-#     solucao.printSolucao()
-
-#     solucao = GRASP_VND(50,instancia,0.5)     
-#     solucao.printSolucao()
-     
-#     solucao = GRASP_VND(50,instancia,0.75)     
-#     solucao.printSolucao()  
-
-    solucao = GRASP_VND(50,instancia,1)     
-    solucao.printSolucao()
- 
-#     solucao = GRASP_VND(50,instancia,0.6)     
-#     solucao.printSolucao()
-
-#     solucao = GRASP_VND(50,instancia,0.7)     
-#     solucao.printSolucao()
-
-#     solucao = GRASP_VND(50,instancia,0.8)     
-#     solucao.printSolucao()
-
-#     geradorteste = gerarVizinhoTHPDD(solucao)
-#     i = 0
-#     for s in geradorteste:
-#         i+=1
-#         if i >= 1 and i<= 3: s.printSolucao()
-#         if i == 1: s.printSolucao()
-
-                    
-                    
-                    
-                    
-                    
-    
+                    self.preferenciasDoProfessori.append(preferenciasDoProfessoriTuplas)               
+        
+        
