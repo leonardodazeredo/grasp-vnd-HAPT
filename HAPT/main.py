@@ -6,6 +6,7 @@
 from metaheuristicas import GRASP_VND
 from manipulaInstancia import Instancia
 import numpy as np
+import threading as th
 
 def carregaTeste(solucao,testePath = 'dataset/testeSolucao'):
     slotsMatrix = []
@@ -28,48 +29,58 @@ def drange(start, stop, step):
         yield r
         r += step
 
+def rodar(alfa,medias):
+    #print("Iniciando Thread alfa =",alfa)
+    beneficios = []
+ 
+    for i in range(20):     
+
+        print("GRASP iteracao %s Alfa = %s" % (i,alfa))
+        solucao = GRASP_VND(30, instancia, alfa)  
+        print("Terminou GRASP iteracao %s Alfa = %s" % (i,alfa))
+
+        beneficios.append(solucao.beneficio())
+
+    medias[alfa] = np.mean(beneficios)
+    print("Beneficio: %s Alfa: %s" % (medias[alfa],alfa))
+
 if __name__ == '__main__':
     instancia = Instancia()
     
-#     solucao = GRASP_VND(1,instancia,0.7)     
-#     solucao.printSolucao()
+    solucao = GRASP_VND(600,instancia,.25)     
+    solucao.printSolucao()
 
-    medias = {}
-    
-    for alfa in [0.00, 0.25, 0.50, 0.75, 1.00]:
-        beneficios = []
-        
-        print("\nAlfa:",alfa)
-        
-        for i in range(10):    
-            print("------",i)   
-            solucao = GRASP_VND(10, instancia, alfa)  
-            beneficios.append(solucao.beneficio())
+    # medias = {}
 
-        medias[alfa] = np.mean(beneficios)
-        print("Media:",medias[alfa])
+    # threads = []
+    # # for alfa in [.0, .25, .50, .75]:
+    # for alfa in [.1, .2, .3]:
+    #     threads.append(th.Thread(target=rodar, args=(alfa,medias,)))
+    # for t in threads:
+    #     t.start()
+    # for t in threads:
+    #     t.join()
+
+    # print("--------------------------------------------------------")
+    # for alfa in sorted(medias.keys()):
+    #     print("Beneficio: %s Alfa: %s" % (medias[alfa],alfa))
         
+    # for d in instancia.disciplinas:
+    #     print(d)   
+    # print("\n")
     
-    for alfa in sorted(medias.keys()):
-        print("Beneficio: %s Alfa: %s" % (medias[alfa],alfa))
+    # for t in instancia.turmas:
+    #     print(t,str(instancia.disciplinasDaTurma(t))) 
+    # print("\n")
+    
+    # for i,t in enumerate(instancia.disciplinasDoProfessori):
+    #     print(i,t)
+    # print("\n")
         
- 
-#     for d in instancia.disciplinas:
-#         print(d)   
-#     print("\n")
-#     
-#     for t in instancia.turmas:
-#         print(t,str(instancia.disciplinasDaTurma(t))) 
-#     print("\n")
-#     
-#     for i,t in enumerate(instancia.disciplinasDoProfessori):
-#         print(i,t)
-#     print("\n")
-#         
-#     for d in instancia.disciplinas:
-#         print(d,instancia.professoresHabilitados(d))
-#     print("\n")
-#
-#     solucao = Solucao(instancia) 
-#     carregaTeste(solucao)
-#     solucao.printSolucao()
+    # for d in instancia.disciplinas:
+    #     print(d,instancia.professoresHabilitados(d))
+    # print("\n")
+
+    # solucao = Solucao(instancia) 
+    # carregaTeste(solucao)
+    # solucao.printSolucao()

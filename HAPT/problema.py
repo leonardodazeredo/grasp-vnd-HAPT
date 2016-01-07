@@ -84,14 +84,14 @@ class Solucao(object):
         restricaoB = self.restricaoB()
         restricaoD = self.restricaoD()
         
-#         if not restricoesDeInstancia:
-#             print('Soucao viola as restricoes de instancia')
-#         if not restricaoA:
-#             print('Solucao viola a restricao A')
-#         if not restricaoB:
-#             print('Solucao viola a restricao B')
-#         if not restricaoD:
-#             print('Solucao viola a restricao D')
+        # if not restricoesDeInstancia:
+        #     print('Soucao viola as restricoes de instancia')
+        # if not restricaoA:
+        #     print('Solucao viola a restricao A')
+        # if not restricaoB:
+        #     print('Solucao viola a restricao B')
+        # if not restricaoD:
+        #     print('Solucao viola a restricao D')
         
         return restricoesDeInstancia and restricaoA and restricaoB and restricaoD
         #restricaoC = True # trivialmente validada pela representacao da solucao
@@ -140,7 +140,7 @@ class Solucao(object):
                     break
         
         if not restricaoA:
-#             print("restricao A violada")
+            # print("restricao A violada")
             return False
         
         return True
@@ -342,7 +342,7 @@ def gerarVizinhoTHPMD(solucao):
                 
                 s = None      
                    
-#             testando aqui a validade do movimento segundo as restricoes de instancia
+                # testando aqui a validade do movimento segundo as restricoes de instancia
                 if slots[chaves[i]] is not None and slots[chaves[j]] is not None:
                     
                     if slots[chaves[i]][1] != slots[chaves[j]][1]:
@@ -378,7 +378,7 @@ def gerarVizinhoTHPDD(solucao):
 
                             s = None        
                             
-#                           Testando a validade do movimento segundo as restricoes de instancia
+                            # Testando a validade do movimento segundo as restricoes de instancia
                             if pivo1 is not None and pivo2 is not None:
                                 if pivo1[1] != pivo1[1]:
                                     if pivo1[0] in solucao.instancia.nomesDisciplinasDaTurma(turmaNome2)\
@@ -397,7 +397,7 @@ def gerarVizinhoTHPDD(solucao):
                                         s =  solucao.trocaSlot((turmaNome1,i1,j1),(turmaNome2,i2,j2))
                                               
                                 if s is not None and s.valida():
-#                                     print('2')
+                                    # print('2')
                                     yield s
 
 def gerarVizinhoTTEP(solucao):   
@@ -410,7 +410,7 @@ def gerarVizinhoTTEP(solucao):
                     if not solucao.instancia.vaga(disciplina1) and not solucao.instancia.vaga(disciplina2):
                         s = solucao.trocaProfessorEntreTurmas(turmaNome1,turmaNome2,disciplina1[0],disciplina2[0])                   
                         if s is not None and s.valida():
-#                             print('3')
+                            # print('3')
                             yield s
 
 def gerarVizinhoTPD(solucao):
@@ -421,5 +421,5 @@ def gerarVizinhoTPD(solucao):
                                    
                     s =  solucao.trocaProfessorDaDisciplinaNaTurma(turmaNome, disciplina[0], professoresHabilitado)                 
                     if s is not None and s.valida():
-#                         print('4')
+                        # print('4')
                         yield s        

@@ -36,11 +36,11 @@ def GRASP_VND(MAX_ITERACOES,instancia,alfa):
     melhorSolucao = Solucao(instancia)
     
     for k in range(MAX_ITERACOES):
-#         print("\nGRASP: Iteracao %s"% k)
+        print("\nGRASP: Iteracao %s"% k)
         
         solucaoCorrente = construcao(instancia,alfa)
         
-#         print("\n    Beneficio apos construcao:", solucaoCorrente.beneficio())
+        # print("\n    Beneficio apos construcao:", solucaoCorrente.beneficio())
         
         solucaoCorrente = VND(solucaoCorrente)
         
