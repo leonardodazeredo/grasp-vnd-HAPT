@@ -36,13 +36,13 @@ def GRASP_VND(MAX_ITERACOES,instancia,alfa):
     melhorSolucao = Solucao(instancia)
     
     for k in range(MAX_ITERACOES):
-        print("\nGRASP: Iteracao %s"% k)
+        print(" GRASP: Iteracao %s"% (k+1))
         
         solucaoCorrente = construcao(instancia,alfa)
         
         # print("\n    Beneficio apos construcao:", solucaoCorrente.beneficio())
         
-        solucaoCorrente = VND(solucaoCorrente)
+        solucaoCorrente = VNS_VND(5,instancia,solucaoCorrente)
         
 #         print("\n    Beneficio apos VND:", solucaoCorrente.beneficio())
         
@@ -107,16 +107,18 @@ def gerarCandidatos(solucao,turmaDisciplinaToCargaDisponivelDic):
                 if s.restricaoA() and s.restricaoD():     
                     turmaDisciplinaToCargaDisponivelDic[turmaNome,disciplina[0]]-= 1     
                     yield slot
-'''
-def VNS_VND(MAX_ITERACOES,instancia):
+
+def VNS_VND(MAX_ITERACOES_SEM_MELHORA,instancia,solucao):
     vizinhancas = [gerarVizinhoTHPMD,gerarVizinhoTHPDD,gerarVizinhoTTEP,gerarVizinhoTPD]
      
-    solucao = construcao(instancia, 1)
-    print("\n    Custo da solucao aleatoria inicial:",solucao.beneficio())
+    # solucao = construcao(instancia, 1)
+    # print("\n    Custo da solucao aleatoria inicial:",solucao.beneficio())
      
     i = 0
-    while i < MAX_ITERACOES:
-        print("\nVNS: Iteracao %s"% i)
+    while i < MAX_ITERACOES_SEM_MELHORA:
+        # print("\nVNS: Iteracao %s"% i)
+
+        solucaoAnterior = solucao
         
         k= 0
         while k < len(vizinhancas):
@@ -125,18 +127,21 @@ def VNS_VND(MAX_ITERACOES,instancia):
             todosVizinhos = [vizinho for vizinho in geradorDeVizinhanca]           
              
             vizinhoAleatorio = random.choice(todosVizinhos)
-            print("\n    Custo do vizinho aleatorio na vizinhanca %s: %s" % (k, vizinhoAleatorio.beneficio()))
+            # print("\n    Custo do vizinho aleatorio na vizinhanca %s: %s" % (k, vizinhoAleatorio.beneficio()))
              
             vizinhoVND = VND(vizinhoAleatorio)
-            print("\n    Custo apos VND:", vizinhoVND.beneficio())
+            # print("\n    Custo apos VND:", vizinhoVND.beneficio())
              
             if vizinhoVND.beneficio() > solucao.beneficio():
                 solucao = vizinhoVND
                 k = 0
             else:
                 k+= 1
+
+        if solucaoAnterior.beneficio() >= solucao.beneficio():
+            i+= 1
+        else:
+            i = 0
+            solucaoAnterior = solucao
             
-        i+=1
-                 
     return solucao
-'''

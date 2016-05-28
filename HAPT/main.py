@@ -3,7 +3,7 @@
 '''
 
 # from problema import Solucao
-from metaheuristicas import GRASP_VND
+from metaheuristicas import GRASP_VND,VNS_VND,construcao
 from manipulaInstancia import Instancia
 import numpy as np
 import threading as th
@@ -29,42 +29,40 @@ def drange(start, stop, step):
         yield r
         r += step
 
-def rodar(alfa,medias):
+def rodarTesteAlfa(alfa):
     #print("Iniciando Thread alfa =",alfa)
     beneficios = []
  
-    for i in range(20):     
+    for i in range(4):     
 
-        print("GRASP iteracao %s Alfa = %s" % (i,alfa))
-        solucao = GRASP_VND(30, instancia, alfa)  
-        print("Terminou GRASP iteracao %s Alfa = %s" % (i,alfa))
+        print("Teste %s GRASP_VND com alfa = %s" % (i+1,alfa))
+        solucao = GRASP_VND(25, instancia, alfa)  
+        print("Terminou teste %s GRASP_VND alfa = %s" % (i+1,alfa))
 
         beneficios.append(solucao.beneficio())
 
-    medias[alfa] = np.mean(beneficios)
-    print("Beneficio: %s Alfa: %s" % (medias[alfa],alfa))
+    print("Beneficio: %s Alfa: %s" % (np.mean(beneficios),alfa))
 
 if __name__ == '__main__':
     instancia = Instancia()
     
-    solucao = GRASP_VND(600,instancia,.25)     
+    solucao = GRASP_VND(10,instancia,.25)     
     solucao.printSolucao()
 
-    # medias = {}
+    # solucao = VNS_VND(10,instancia,construcao(instancia, .25))     
+    # solucao.printSolucao()
 
     # threads = []
     # # for alfa in [.0, .25, .50, .75]:
     # for alfa in [.1, .2, .3]:
-    #     threads.append(th.Thread(target=rodar, args=(alfa,medias,)))
+    # # for alfa in [.3]:
+    #     threads.append(th.Thread(target=rodarTesteAlfa, args=(alfa,)))
     # for t in threads:
     #     t.start()
+
     # for t in threads:
     #     t.join()
 
-    # print("--------------------------------------------------------")
-    # for alfa in sorted(medias.keys()):
-    #     print("Beneficio: %s Alfa: %s" % (medias[alfa],alfa))
-        
     # for d in instancia.disciplinas:
     #     print(d)   
     # print("\n")
