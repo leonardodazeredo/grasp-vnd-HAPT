@@ -1,0 +1,72 @@
+Teste GRASP_VND com alfa = 0.0
+
+Beneficio da solucao: 697
+Solucao valida
+
+------------------------------------------------------------------------------------
+
+Teste GRASP_VND com alfa = 0.25
+
+Beneficio da solucao: 690
+Solucao valida
+
+------------------------------------------------------------------------------------
+
+Teste GRASP_VND com alfa = 0.5
+
+Beneficio da solucao: 698
+Solucao valida
+
+------------------------------------------------------------------------------------
+
+Teste GRASP_VND com alfa = 0.75
+
+Beneficio da solucao: 692
+Solucao valida
+
+------------------------------------------------------------------------------------
+
+Teste GRASP_VND com alfa = 1.0
+
+Beneficio da solucao: 686
+Solucao valida
+
+------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------
+
+Turma ADS1
+[('ADS_D2', 0), ('ADS_D1', 1), ('ADS_D3', 3), ('ADS_D2', 0), ('ADS_D4', 4)]
+[('ADS_D2', 0), ('ADS_D1', 1), ('ADS_D3', 3), ('ADS_D5', 5), ('ADS_D5', 5)]
+
+Turma ADS3
+[('ADS_D6', 6), ('ADS_D9', 9), ('ADS_D10', 10), ('ADS_D7', 7), ('ADS_D11', 1)]
+[('ADS_D6', 6), ('ADS_D9', 9), ('ADS_D10', 10), ('ADS_D8', 8), ('ADS_D11', 1)]
+
+Turma ADS5
+[('ADS_D12', 2), ('ADS_D13', 11), ('ADS_D14', 11), ('ADS_D15', 10), ('ADS_D16', 12)]
+[('ADS_D12', 2), ('ADS_D13', 11), ('ADS_D14', 11), ('ADS_D15', 10), ('ADS_D16', 12)]
+
+Turma SI1
+[('SI_D3', 8), ('SI_D2', 13), ('SI_D7', 16), ('SI_D5', 14), ('SI_D1', 0)]
+[('SI_D4', 17), ('SI_D2', 13), ('SI_D7', 16), ('SI_D6', 15), ('SI_D1', 0)]
+
+Turma SI3
+[('SI_D10', 1), ('SI_D11', 7), ('SI_D9', 8), ('SI_D8', 9), ('SI_D12', 20)]
+[('SI_D10', 1), ('VAGA', None), ('SI_D9', 8), ('SI_D8', 9), ('SI_D12', 20)]
+
+Turma SI5
+[('SI_D13', 18), ('SI_D16', 0), ('SI_D14', 1), ('VAGA', None), ('SI_D15', 10)]
+[('SI_D13', 18), ('SI_D16', 0), ('SI_D14', 1), ('SI_D17', 19), ('SI_D15', 10)]
+
+Turma SI7
+[('SI_D18', 12), ('SI_D19', 2), ('SI_D20', 9), ('SI_D21', 8), ('VAGA', None)]
+[('SI_D18', 12), ('SI_D19', 2), ('SI_D20', 9), ('VAGA', None), ('VAGA', None)]
+
+Beneficio da solucao: 698
+Solucao valida
+------------------------------------------------------------------------------------
+Alfa: 0.5
+real	265m37.109s
+user	265m28.576s
+sys	0m1.700s

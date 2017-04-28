@@ -7,6 +7,7 @@ from metaheuristicas import GRASP_VND,VNS_VND,GRASP_VNS_VND,construcao
 from manipulaInstancia import Instancia
 import numpy as np
 import threading as th
+import copy
 
 def carregaTeste(solucao,testePath = 'dataset/testeSolucao'):
     slotsMatrix = []
@@ -27,16 +28,23 @@ def carregaTeste(solucao,testePath = 'dataset/testeSolucao'):
 def VNS_VND_test():
     instancia = Instancia()
 
+    melhorSolucao = (construcao(instancia, 1), -1, -1)
+
     for i in range(100):
         print("Teste %s VNS_VND " % (i))
 
-        solucao = VNS_VND(10,instancia,construcao(instancia, 1))
+        solucao = VNS_VND(5,instancia,construcao(instancia, 1))
+
+        if beneficio(solucao) > beneficio(melhorSolucao[0]):
+            melhorSolucao = (copy.deepcopy(solucao),i)
 
         print("\nBeneficio da solucao:",beneficio(solucao))
         print("Solucao valida" if solucao.valida() else "Solucao invalida")
 
         print('\n------------------------------------------------------------------------------------\n')
 
+    melhorSolucao[0].printSolucao()
+    print("Iteracao: " + str(melhorSolucao[1]))
 
 def GRASP_VND_test():
     instancia = Instancia()
@@ -46,10 +54,10 @@ def GRASP_VND_test():
     for alfa in [.0, .25, .50, .75, 1.0]:
         print("Teste GRASP_VND com alfa = %s" % (alfa))
 
-        solucao = GRASP_VND(100, instancia, alfa)
+        solucao = GRASP_VND(200, instancia, alfa)
 
         if beneficio(solucao) > beneficio(melhorSolucao[0]):
-            melhorSolucao = (solucao,alfa)
+            melhorSolucao = (copy.deepcopy(solucao),alfa)
 
         print("\nBeneficio da solucao:",beneficio(solucao))
         print("Solucao valida" if solucao.valida() else "Solucao invalida")
@@ -57,7 +65,7 @@ def GRASP_VND_test():
         print('\n------------------------------------------------------------------------------------\n')
 
     melhorSolucao[0].printSolucao()
-    print("Alfa: " + melhorSolucao[1])
+    print("Alfa: " + str(melhorSolucao[1]))
 
 
 def GRASP_VNS_VND_test():
@@ -68,10 +76,10 @@ def GRASP_VNS_VND_test():
     for alfa in [.0, .25, .50, .75, 1.0]:
         print("Teste GRASP_VNS_VND com alfa = %s" % (alfa))
 
-        solucao = GRASP_VNS_VND(100, instancia, alfa)
+        solucao = GRASP_VNS_VND(200, instancia, alfa)
 
         if beneficio(solucao) > beneficio(melhorSolucao[0]):
-            melhorSolucao = (solucao,alfa)
+            melhorSolucao = (copy.deepcopy(solucao),alfa)
 
         print("\nBeneficio da solucao:",beneficio(solucao))
         print("Solucao valida" if solucao.valida() else "Solucao invalida")
@@ -79,7 +87,7 @@ def GRASP_VNS_VND_test():
         print('\n------------------------------------------------------------------------------------\n')
 
     melhorSolucao[0].printSolucao()
-    print("Alfa: " + melhorSolucao[1])
+    print("Alfa: " + str(melhorSolucao[1]))
 
 
 if __name__ == '__main__':

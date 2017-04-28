@@ -117,7 +117,7 @@ def GRASP_VNS_VND(MAX_ITERACOES,instancia,alfa):
 
         # print("\n    Beneficio apos construcao:", solucaoCorrente.beneficio())
 
-        solucaoCorrente = VNS_VND(10,instancia,solucaoCorrente)
+        solucaoCorrente = VNS_VND(3,instancia,solucaoCorrente)
 
 #         print("\n    Beneficio apos VND:", solucaoCorrente.beneficio())
 
@@ -148,7 +148,7 @@ def VNS_VND(MAX_ITERACOES_SEM_MELHORA,instancia,solucao):
             # print("\n    Custo do vizinho aleatorio na vizinhanca %s: %s" % (k, vizinhoAleatorio.beneficio()))
 
             vizinhoVND = VND(vizinhoAleatorio)
-            # print("\n    Custo apos VND:", vizinhoVND.beneficio())
+            print("\n    Custo apos VND:", vizinhoVND.beneficio())
 
             if vizinhoVND.beneficio() > solucao.beneficio():
                 solucao = vizinhoVND
@@ -161,5 +161,7 @@ def VNS_VND(MAX_ITERACOES_SEM_MELHORA,instancia,solucao):
         else:
             i = 0
             solucaoAnterior = solucao
+
+        print("\n"+str(i)+"\n")
 
     return solucao
