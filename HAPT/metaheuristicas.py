@@ -4,69 +4,10 @@
 from problema import Solucao,gerarVizinhoTHPMD,gerarVizinhoTHPDD,gerarVizinhoTTEP,gerarVizinhoTPD
 import random,copy
 
-def buscaLocalBestImprovement(solucaoInicial,geradorDeVizinhanca):
-    melhor = solucaoInicial
-    for vizinho in geradorDeVizinhanca:
-        if vizinho.beneficio() > melhor.beneficio():
-            melhor = vizinho
-
-    return melhor
-
-def VND(solucaoInicial):
-    vizinhancas = [gerarVizinhoTHPMD,gerarVizinhoTHPDD,gerarVizinhoTTEP,gerarVizinhoTPD]
-
-    solucaoCorrente = copy.deepcopy(solucaoInicial)
-
-    k= 0
-    while k < len(vizinhancas):
-
-        geradorDeVizinhanca = vizinhancas[k](solucaoCorrente)
-
-        vizinhoCorrente = buscaLocalBestImprovement(solucaoCorrente,geradorDeVizinhanca)
-
-        if vizinhoCorrente.beneficio() > solucaoCorrente.beneficio():
-            solucaoCorrente = vizinhoCorrente
-            k = 0
-        else:
-            k+= 1
-
-    return solucaoCorrente
-
-def construcao(instancia,alfa):
-#     print("    Construindo solucao com alfa = %s"%str(alfa))
-
-    solucao = Solucao(instancia)
-    turmaDisciplinaToCargaDisponivelDic = solucao.instancia.turmaDisciplinaToCargaDic
-
-    while not solucao.completa():
-
-        geradorDeCandidatos = gerarCandidatos(solucao,turmaDisciplinaToCargaDisponivelDic)
-        todosCandidatos = [(slot,solucao.custoIncremental(slot)[1]) for slot in geradorDeCandidatos]
-
-        if todosCandidatos:
-            todosCandidatos.sort(key=lambda x: x[1], reverse=True)
-
-            RCL = [ c for c in todosCandidatos if custo(c) >= custo(todosCandidatos[0]) - alfa*(custo(todosCandidatos[0]) - custo(todosCandidatos[-1])) ]
-
-            aleatorio = random.choice(RCL)[0]
-
-            (turmaNome,i,j) = solucao.slotVazio()
-            turmaDisciplinaToCargaDisponivelDic[turmaNome,aleatorio[0]]-= 1
-            solucao.adicionar(aleatorio)
-
-        else:
-            (turmaNome,i,j) = solucao.slotVazio()
-#             print("    Reiniciando construcao: Nenhum candidato para o slot (%d,%d) da turma %s." % (i,j,turmaNome))
-
-            solucao = Solucao(instancia)
-            turmaDisciplinaToCargaDisponivelDic = solucao.instancia.turmaDisciplinaToCargaDic
-
-    return solucao
-
-def tupla(candidato):
+def getAtividade(candidato):
     return candidato[0]
 
-def custo(candidato):
+def getBeneficio(candidato):
     return candidato[1]
 
 def gerarCandidatos(solucao,turmaDisciplinaToCargaDisponivelDic):
@@ -87,6 +28,47 @@ def gerarCandidatos(solucao,turmaDisciplinaToCargaDisponivelDic):
                 if s.restricaoA() and s.restricaoD():
                     turmaDisciplinaToCargaDisponivelDic[turmaNome,disciplina[0]]-= 1
                     yield slot
+
+def buscaLocalBestImprovement(solucaoInicial,geradorDeVizinhanca):
+    melhor = solucaoInicial
+    for vizinho in geradorDeVizinhanca:
+        if vizinho.beneficio() > melhor.beneficio():
+            melhor = vizinho
+
+    return melhor
+
+def construcao(instancia,alfa):
+#     print("    Construindo solucao com alfa = %s"%str(alfa))
+
+    solucao = Solucao(instancia)
+    turmaDisciplinaToCargaDisponivelDic = solucao.instancia.turmaDisciplinaToCargaDic
+
+    while not solucao.completa():
+
+        geradorDeCandidatos = gerarCandidatos(solucao,turmaDisciplinaToCargaDisponivelDic)
+        todosCandidatos = [(slot,solucao.beneficioIncremental(slot)[1]) for slot in geradorDeCandidatos]
+
+        if todosCandidatos:
+            todosCandidatos.sort(key=lambda x: x[1], reverse=True)
+
+            RCL = [ c for c in todosCandidatos if getBeneficio(c) >= getBeneficio(todosCandidatos[0]) - alfa*(getBeneficio(todosCandidatos[0]) - getBeneficio(todosCandidatos[-1])) ]
+
+            aleatorio = random.choice(RCL)[0]
+
+            (turmaNome,i,j) = solucao.slotVazio()
+            turmaDisciplinaToCargaDisponivelDic[turmaNome,aleatorio[0]]-= 1
+            solucao.adicionar(aleatorio)
+
+        else:
+            (turmaNome,i,j) = solucao.slotVazio()
+#             print("    Reiniciando construcao: Nenhum candidato para o slot (%d,%d) da turma %s." % (i,j,turmaNome))
+
+            solucao = Solucao(instancia)
+            turmaDisciplinaToCargaDisponivelDic = solucao.instancia.turmaDisciplinaToCargaDic
+
+    return solucao
+
+
 
 def GRASP_VND(MAX_ITERACOES,instancia,alfa):
     melhorSolucao = Solucao(instancia)
@@ -117,8 +99,9 @@ def GRASP_VNS_VND(MAX_ITERACOES,instancia,alfa):
 
         # print("\n    Beneficio apos construcao:", solucaoCorrente.beneficio())
 
-        solucaoCorrente = VNS_VND(3,instancia,solucaoCorrente)
+        solucaoCorrente = VNS_VND(1,instancia,solucaoCorrente)
 
+        print(k)
 #         print("\n    Beneficio apos VND:", solucaoCorrente.beneficio())
 
         if melhorSolucao.beneficio() < solucaoCorrente.beneficio():
@@ -130,7 +113,7 @@ def VNS_VND(MAX_ITERACOES_SEM_MELHORA,instancia,solucao):
     vizinhancas = [gerarVizinhoTHPMD,gerarVizinhoTHPDD,gerarVizinhoTTEP,gerarVizinhoTPD]
 
     # solucao = construcao(instancia, 1)
-    # print("\n    Custo da solucao aleatoria inicial:",solucao.beneficio())
+    # print("\n    Beneficio da solucao aleatoria inicial:",solucao.beneficio())
 
     i = 0
     while i < MAX_ITERACOES_SEM_MELHORA:
@@ -144,11 +127,11 @@ def VNS_VND(MAX_ITERACOES_SEM_MELHORA,instancia,solucao):
             geradorDeVizinhanca = vizinhancas[k](solucao)
             todosVizinhos = [vizinho for vizinho in geradorDeVizinhanca]
 
-            vizinhoAleatorio = random.choice(todosVizinhos)
-            # print("\n    Custo do vizinho aleatorio na vizinhanca %s: %s" % (k, vizinhoAleatorio.beneficio()))
+            vizinhoAleatorio = random.SystemRandom().choice(todosVizinhos)
+            # print("\n    Beneficio do vizinho aleatorio na vizinhanca %s: %s" % (k, vizinhoAleatorio.beneficio()))
 
             vizinhoVND = VND(vizinhoAleatorio)
-            print("\n    Custo apos VND:", vizinhoVND.beneficio())
+            # print("\n    Beneficio apos VND:", vizinhoVND.beneficio())
 
             if vizinhoVND.beneficio() > solucao.beneficio():
                 solucao = vizinhoVND
@@ -162,6 +145,26 @@ def VNS_VND(MAX_ITERACOES_SEM_MELHORA,instancia,solucao):
             i = 0
             solucaoAnterior = solucao
 
-        print("\n"+str(i)+"\n")
+        # print("\n"+str(i)+"\n")
 
     return solucao
+
+def VND(solucaoInicial):
+    vizinhancas = [gerarVizinhoTHPMD,gerarVizinhoTHPDD,gerarVizinhoTTEP,gerarVizinhoTPD]
+
+    solucaoCorrente = copy.deepcopy(solucaoInicial)
+
+    k= 0
+    while k < len(vizinhancas):
+
+        geradorDeVizinhanca = vizinhancas[k](solucaoCorrente)
+
+        vizinhoCorrente = buscaLocalBestImprovement(solucaoCorrente,geradorDeVizinhanca)
+
+        if vizinhoCorrente.beneficio() > solucaoCorrente.beneficio():
+            solucaoCorrente = vizinhoCorrente
+            k = 0
+        else:
+            k+= 1
+
+    return solucaoCorrente
