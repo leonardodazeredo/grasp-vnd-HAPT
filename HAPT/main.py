@@ -8,6 +8,7 @@ from manipulaInstancia import Instancia
 import numpy as np
 import threading as th
 import copy
+from logger import log
 
 def carregaTeste(solucao,testePath = 'dataset/testeSolucao'):
     slotsMatrix = []
@@ -33,7 +34,7 @@ def VNS_VND_test():
     for i in range(100):
         print("Teste %s VNS_VND " % (i))
 
-        solucao = VNS_VND(5,instancia,construcao(instancia, 1))
+        solucao = VNS_VND(5,instancia)
 
         if beneficio(solucao) > beneficio(melhorSolucao[0]):
             melhorSolucao = (copy.deepcopy(solucao),i)
@@ -51,7 +52,8 @@ def GRASP_VND_test():
 
     melhorSolucao = (construcao(instancia, 1), -1, -1)
 
-    for alfa in [.0, .25, .50, .75, 1.0]:
+    # for alfa in [.0, .25, .50, .75, 1.0]:
+    for alfa in [.50]:
         print("Teste GRASP_VND com alfa = %s" % (alfa))
 
         solucao = GRASP_VND(200, instancia, alfa)
@@ -92,8 +94,8 @@ def GRASP_VNS_VND_test():
 
 if __name__ == '__main__':
     # VNS_VND_test()
-    # GRASP_VND_test()
-    GRASP_VNS_VND_test()
+    GRASP_VND_test()
+    # GRASP_VNS_VND_test()
 
     # for d in instancia.disciplinas:
     #     print(d)

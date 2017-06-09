@@ -3,6 +3,7 @@
 '''
 from problema import Solucao,gerarVizinhoTHPMD,gerarVizinhoTHPDD,gerarVizinhoTTEP,gerarVizinhoTPD
 import random,copy
+import logger
 
 def getAtividade(candidato):
     return candidato[0]
@@ -38,14 +39,14 @@ def buscaLocalBestImprovement(solucaoInicial,geradorDeVizinhanca):
     return melhor
 
 def construcao(instancia,alfa):
-#     print("    Construindo solucao com alfa = %s"%str(alfa))
+    logger.log("    Construindo solucao com alfa = %s" % str(alfa), logger.debugModeTotal)
 
     solucao = Solucao(instancia)
     turmaDisciplinaToCargaDisponivelDic = solucao.instancia.turmaDisciplinaToCargaDic
 
     while not solucao.completa():
 
-        geradorDeCandidatos = gerarCandidatos(solucao,turmaDisciplinaToCargaDisponivelDic)
+        geradorDeCandidatos = gerarCandidatos(solucao, turmaDisciplinaToCargaDisponivelDic)
         todosCandidatos = [(slot,solucao.beneficioIncremental(slot)[1]) for slot in geradorDeCandidatos]
 
         if todosCandidatos:
@@ -53,7 +54,7 @@ def construcao(instancia,alfa):
 
             RCL = [ c for c in todosCandidatos if getBeneficio(c) >= getBeneficio(todosCandidatos[0]) - alfa*(getBeneficio(todosCandidatos[0]) - getBeneficio(todosCandidatos[-1])) ]
 
-            aleatorio = random.choice(RCL)[0]
+            aleatorio = random.SystemRandom().choice(RCL)[0]
 
             (turmaNome,i,j) = solucao.slotVazio()
             turmaDisciplinaToCargaDisponivelDic[turmaNome,aleatorio[0]]-= 1
@@ -61,8 +62,10 @@ def construcao(instancia,alfa):
 
         else:
             (turmaNome,i,j) = solucao.slotVazio()
-#             print("    Reiniciando construcao: Nenhum candidato para o slot (%d,%d) da turma %s." % (i,j,turmaNome))
 
+            logger.log("    Reiniciando construcao: Nenhum candidato para o slot (%d,%d) da turma %s." % (i,j,turmaNome), logger.debugModeTotal)
+
+            # random.shuffle(instancia.turmas)
             solucao = Solucao(instancia)
             turmaDisciplinaToCargaDisponivelDic = solucao.instancia.turmaDisciplinaToCargaDic
 
@@ -74,15 +77,15 @@ def GRASP_VND(MAX_ITERACOES,instancia,alfa):
     melhorSolucao = Solucao(instancia)
 
     for k in range(MAX_ITERACOES):
-        # print(" GRASP: Iteracao %s"% (k+1))
+        logger.log(" GRASP: Iteracao %s" % (k+1), logger.debugModeTotal)
 
         solucaoCorrente = construcao(instancia,alfa)
 
-        # print("\n    Beneficio apos construcao:", solucaoCorrente.beneficio())
+        logger.log("\n    Beneficio apos construcao: %s" % solucaoCorrente.beneficio(), logger.debugModeTotal)
 
         solucaoCorrente = VND(solucaoCorrente)
 
-#         print("\n    Beneficio apos VND:", solucaoCorrente.beneficio())
+        logger.log("\n    Beneficio apos VND: %s" % solucaoCorrente.beneficio(), logger.debugModeTotal)
 
         if melhorSolucao.beneficio() < solucaoCorrente.beneficio():
             melhorSolucao = copy.deepcopy(solucaoCorrente)
@@ -93,27 +96,34 @@ def GRASP_VNS_VND(MAX_ITERACOES,instancia,alfa):
     melhorSolucao = Solucao(instancia)
 
     for k in range(MAX_ITERACOES):
-        # print(" GRASP: Iteracao %s"% (k+1))
+        logger.log(" GRASP: Iteracao %s" % k, logger.debugModeTotal)
 
         solucaoCorrente = construcao(instancia,alfa)
 
-        # print("\n    Beneficio apos construcao:", solucaoCorrente.beneficio())
+        logger.log("\n    Beneficio apos construcao: %s" % solucaoCorrente.beneficio(), logger.debugModeTotal)
 
         solucaoCorrente = VNS_VND(1,instancia,solucaoCorrente)
 
-        print(k)
-#         print("\n    Beneficio apos VND:", solucaoCorrente.beneficio())
+        logger.log("\n    Beneficio apos VND: %s" % solucaoCorrente.beneficio(), logger.debugModeTotal)
 
         if melhorSolucao.beneficio() < solucaoCorrente.beneficio():
             melhorSolucao = copy.deepcopy(solucaoCorrente)
 
     return melhorSolucao
 
-def VNS_VND(MAX_ITERACOES_SEM_MELHORA,instancia,solucao):
+def VNS_VND(MAX_ITERACOES_SEM_MELHORA,instancia,solucaoInicial=None):
+
+    if solucaoInicial is not None:
+        solucao = solucaoInicial
+    else:
+        random.shuffle(instancia.turmas)
+        solucao = construcao(instancia, 1)
+
+    logger.log("Iniciando VNS com VND")
+
     vizinhancas = [gerarVizinhoTHPMD,gerarVizinhoTHPDD,gerarVizinhoTTEP,gerarVizinhoTPD]
 
-    # solucao = construcao(instancia, 1)
-    # print("\n    Beneficio da solucao aleatoria inicial:",solucao.beneficio())
+    logger.log("\n    Beneficio da solucao inicial: %s" % solucao.beneficio(), logger.debugModeTotal)
 
     i = 0
     while i < MAX_ITERACOES_SEM_MELHORA:
@@ -128,10 +138,10 @@ def VNS_VND(MAX_ITERACOES_SEM_MELHORA,instancia,solucao):
             todosVizinhos = [vizinho for vizinho in geradorDeVizinhanca]
 
             vizinhoAleatorio = random.SystemRandom().choice(todosVizinhos)
-            # print("\n    Beneficio do vizinho aleatorio na vizinhanca %s: %s" % (k, vizinhoAleatorio.beneficio()))
+            logger.log("\n    Beneficio do vizinho aleatorio na vizinhanca %s: %s" % (k, vizinhoAleatorio.beneficio()), logger.debugModeTotal)
 
             vizinhoVND = VND(vizinhoAleatorio)
-            # print("\n    Beneficio apos VND:", vizinhoVND.beneficio())
+            logger.log("\n    Beneficio apos VND: %s" % vizinhoVND.beneficio(), logger.debugModeTotal)
 
             if vizinhoVND.beneficio() > solucao.beneficio():
                 solucao = vizinhoVND
@@ -144,8 +154,6 @@ def VNS_VND(MAX_ITERACOES_SEM_MELHORA,instancia,solucao):
         else:
             i = 0
             solucaoAnterior = solucao
-
-        # print("\n"+str(i)+"\n")
 
     return solucao
 
