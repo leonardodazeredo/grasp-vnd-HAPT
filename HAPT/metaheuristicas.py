@@ -21,14 +21,14 @@ def gerarCandidatos(solucao,turmaDisciplinaToCargaDisponivelDic):
 
             for professor in solucao.instancia.professoresHabilitados(disciplina):
 
-                slot = (disciplina[0],professor)
+                candidato = (disciplina[0],professor)
 
                 s = copy.deepcopy(solucao)
-                s.setSlot(turmaNome,i,j,slot)
+                s.setSlot(turmaNome,i,j,candidato)
 
                 if s.restricaoA() and s.restricaoD():
                     turmaDisciplinaToCargaDisponivelDic[turmaNome,disciplina[0]]-= 1
-                    yield slot
+                    yield candidato
 
 def buscaLocalBestImprovement(solucaoInicial,geradorDeVizinhanca):
     melhor = solucaoInicial
@@ -47,7 +47,7 @@ def construcao(instancia,alfa):
     while not solucao.completa():
 
         geradorDeCandidatos = gerarCandidatos(solucao, turmaDisciplinaToCargaDisponivelDic)
-        todosCandidatos = [(slot,solucao.beneficioIncremental(slot)[1]) for slot in geradorDeCandidatos]
+        todosCandidatos = [(candidato,solucao.beneficioIncremental(candidato)[1]) for candidato in geradorDeCandidatos]
 
         if todosCandidatos:
             todosCandidatos.sort(key=lambda x: x[1], reverse=True)
